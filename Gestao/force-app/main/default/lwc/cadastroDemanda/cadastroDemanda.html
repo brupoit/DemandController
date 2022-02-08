@@ -1,0 +1,41 @@
+<template>
+  <lightning-card
+    variant="Narrow"
+    title="Controle de Demandas"
+    icon-name="standard:account"
+  >
+    <p class="slds-p-horizontal_small">Cadastro semanal de demandas.</p>
+    <div class="slds-m-top_small slds-m-bottom_medium">
+      <lightning-button
+        variant="brand"
+        label="Alocar Consultor"
+        icon-name="utility:people"
+        title="Alocar Consultor"
+        onclick={handleClickConsultor}
+        class="slds-m-left_x-small"
+      ></lightning-button>
+    </div>
+    <div style="height: 300px">
+      <lightning-datatable
+        key-field="id"
+        data={data}
+        columns={columns}
+        onrowaction={handleRowAction}
+      >
+      </lightning-datatable>
+    </div>
+  </lightning-card>
+
+  <c-cadastrar-alocacao-semanal
+    if:true={isModalOpen}
+    onclose={handleClose}
+  ></c-cadastrar-alocacao-semanal>
+  <c-cadastro-semana
+    if:true={cadSemana}
+    onclose={handleClose}
+  ></c-cadastro-semana>
+  <c-cadastro-consultor
+    if:true={cadConsultor}
+    onclose={handleClose}
+  ></c-cadastro-consultor>
+</template>

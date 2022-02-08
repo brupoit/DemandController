@@ -1,0 +1,41 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <lightning-card
+      variant="Narrow"
+      title="Mapa de Alocação"
+      icon-name="standard:account"
+    >
+      <lightning-tabset>
+        <b>
+        <lightning-input type="date" name="Data Inicial" label="Data Inicial" value={inicialDate}></lightning-input>
+        <lightning-input type="date" name="Data Final" label="Data Final" value={finalDate}></lightning-input>
+      </b>
+        <lightning-tab label="Por Profissional">
+         <p align="right">
+          <lightning-button
+          variant="brand"
+          label=""
+          title="Ver intervalo selecionado"
+          icon-name="utility:enter"
+          onclick={getMappedQuery}
+          class="slds-var-m-center_small"
+        >
+        </lightning-button>
+      </p>
+          <lightning-card title="Open Opportunities" icon-name="utility:chart">
+            <template if:true={chartConfiguration}>
+                <c-modulechartjs chart-config={chartConfiguration}></c-modulechartjs>
+            </template>
+          </lightning-card>
+          <lightning-datatable
+            key-field="id"
+            data={data}
+            columns={columns}
+            onrowaction={handleRowAction}
+            onrowselection={handleRowSelection}
+          >
+          </lightning-datatable>
+        </lightning-tab>
+      </lightning-tabset>
+    </lightning-card>
+  </template>

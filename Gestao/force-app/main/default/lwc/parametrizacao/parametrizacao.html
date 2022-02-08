@@ -1,0 +1,36 @@
+<template>
+  <c-modal-cadastro-alocacao if:true={modalAlocacao} onclose={handleClose}>
+  </c-modal-cadastro-alocacao>
+
+  <lightning-card
+    variant="Narrow"
+    title="Parametrizações"
+    icon-name="standard:account"
+  > 
+    <div class="slds-clearfix">
+    <div class="slds-m-top_small slds-m-bottom_medium slds-float_left">
+    <lightning-button
+      variant="neutral"
+      label="Criar Alocação"
+      title="Cadastrar nova alocação de profissional em uma demanda"
+      icon-name="utility:custom_apps"
+      onclick={handleClickAddAlocacao}
+      class="slds-m-left_x-small"
+    >
+    </lightning-button>
+  </div>
+</div>
+
+    <lightning-tabset>
+      <lightning-tab label="Perfis de Colaborador">
+        <c-perfis-disponiveis></c-perfis-disponiveis>
+      </lightning-tab>
+      <lightning-tab label="Perfil Indisponibilidade">
+        <c-perfis-indispo></c-perfis-indispo>
+      </lightning-tab>
+      <lightning-tab label="Skills Gestão de Demandas">
+        <c-skill-Gest></c-skill-Gest>
+      </lightning-tab>
+    </lightning-tabset>
+  </lightning-card>
+</template>

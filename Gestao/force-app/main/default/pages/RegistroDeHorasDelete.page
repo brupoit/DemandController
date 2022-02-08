@@ -1,0 +1,2 @@
+<apex:page action="{!gotoRegistroDeHoras}" standardController="Registro_de_horas__c" extensions="RegistroDeHorasDeleteController">
+</apex:page>

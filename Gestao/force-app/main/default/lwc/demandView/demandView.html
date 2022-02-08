@@ -1,0 +1,47 @@
+<!-- sldsValidatorIgnore -->
+<template>
+  <c-modal-cadastro-demanda if:true={cadDemanda} onclose={handleClose}>
+  </c-modal-cadastro-demanda>
+  <c-modal-cadastro-alocacao if:true={modalAlocacao} onclose={handleClose}>
+  </c-modal-cadastro-alocacao>
+  <lightning-card
+    variant="Narrow"
+    title="Controle de Demandas"
+    icon-name="standard:account"
+  >
+    <div class="slds-clearfix">
+      <div class="slds-m-top_small slds-m-bottom_medium slds-float_left">
+        <lightning-button
+          variant="neutral"
+          label="Criar Demanda"
+          title="Cadastrar uma nova demanda"
+          onclick={handleClickDemanda}
+          icon-name="utility:desktop"
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="neutral"
+          label="Criar Alocação"
+          title="Cadastrar nova alocação de profissional em uma demanda"
+          icon-name="utility:custom_apps"
+          onclick={handleClickAddAlocacao}
+          class="slds-var-m-left_x-small"
+        >
+        </lightning-button>
+      </div>
+    </div>
+    <lightning-tabset>
+      <lightning-tab label="Cadastro de Demandas">
+        <lightning-datatable
+          key-field="id"
+          data={data}
+          columns={columns}
+          onrowaction={handleRowAction}
+          onrowselection={handleRowSelection}
+        >
+        </lightning-datatable>
+      </lightning-tab>
+    </lightning-tabset>
+  </lightning-card>
+</template>

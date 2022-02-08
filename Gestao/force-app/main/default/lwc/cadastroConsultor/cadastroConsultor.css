@@ -1,0 +1,32 @@
+.slds-modal__container {
+  width: 50%;
+}
+
+.slds-modal__content {
+  overflow: visible;
+}
+
+form {
+  position: relative;
+}
+
+.list {
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  background-color: #fff;
+  padding: 0.5rem 0;
+  box-shadow: 0px 10px 20px 1px;
+  max-height: 375px;
+  overflow-y: auto;
+  border-radius: 5px;
+}
+
+.slds-item {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.slds-item:hover {
+  background-color: #f3f2f2;
+}

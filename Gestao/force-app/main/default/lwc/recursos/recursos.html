@@ -1,0 +1,74 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 02-07-2022
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <c-modal-cadastro-profissional
+    if:true={modalProfissional}
+    onclose={handleClose}
+  >
+  </c-modal-cadastro-profissional>
+
+  <c-modal-cadastro-alocacao if:true={modalAlocacao} onclose={handleClose}>
+  </c-modal-cadastro-alocacao>
+
+  <c-modal-cadastro-indisponibilidade if:true={modalIndisponibilidade} onclose={handleClose}>
+  </c-modal-cadastro-indisponibilidade>
+
+
+  <lightning-card
+    variant="Narrow"
+    title="Recursos"
+    icon-name="standard:account"
+  >
+ 
+    <div class="slds-clearfix">
+      <div class="slds-m-top_small slds-m-bottom_medium slds-float_left">
+        <lightning-button
+          variant="neutral"
+          label="Criar Profissional/Funcionário"
+          title="Cadastrar um novo profissional/funcionário"
+          icon-name="utility:adduser"
+          onclick={handleClickAddProfissional}
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="neutral"
+          label="Criar Alocação"
+          title="Cadastrar nova alocação de profissional em uma demanda"
+          icon-name="utility:custom_apps"
+          onclick={handleClickAddAlocacao}
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="neutral"
+          label="Criar Indisponibilidade"
+          title="Cadastrar status de indisponibilidade para um colaborador"
+          icon-name="utility:custom_apps"
+          onclick={handleClickAddIndisponibilidade}
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+      </div>
+    </div>
+    <lightning-tabset>
+      <lightning-tab label="Disponíveis">
+        <c-recursos-disponiveis-control init-date={initDate} end-date={endDate}> </c-recursos-disponiveis-control>
+      </lightning-tab>
+      <lightning-tab label="Alocados">
+        <c-recursos-alocados-control init-date={initDate} end-date={endDate}> </c-recursos-alocados-control>
+      </lightning-tab>
+      <lightning-tab label="Indisponíveis">
+        <c-recursos-indisponiveis-control init-date={initDate} end-date={endDate}> </c-recursos-indisponiveis-control>
+      </lightning-tab>
+      <lightning-tab label="Skills do Profissional">
+        <c-skills init-date={initDate} end-date={endDate}> </c-skills>
+      </lightning-tab>
+    </lightning-tabset>
+  </lightning-card>
+</template>

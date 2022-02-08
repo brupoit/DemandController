@@ -1,0 +1,39 @@
+<template>
+    <lightning-tabset variant="vertical">
+        <!-- PERFIL PROFISSIONAL -->
+        <lightning-tab label="Perfil Profissional">
+            <div class="slds-p-bottom_small slds-border_bottom slds-clearfix">
+                <c-modal-cadastro-perfil if:true={cadPerfil} onclose={handleClose}></c-modal-cadastro-perfil>
+                
+                    <lightning-button
+                        variant="brand"
+                        label="Criar Perfil Profissional"
+                        title="Cadastrar um novo perfil profissional."
+                        icon-name="utility:profile"
+                        class="slds-float_right"
+                        onclick={handleClickPerfil}>
+                    </lightning-button>
+                
+            </div>
+            <div class="slds-m-vertical_medium">
+                <c-teste-tabela-perfil></c-teste-tabela-perfil>
+            </div>
+        </lightning-tab>
+        <!-- PROFISSIONAL -->
+        <lightning-tab label="Profissional">
+            Two Content !
+        </lightning-tab>
+        <!-- INDISPONIBILIDADE -->
+        <lightning-tab label="Indisponibilidade">
+            Three Content !
+        </lightning-tab>
+        <!-- DEMANDA -->
+        <lightning-tab label="Demanda">
+            Three Content !
+        </lightning-tab>
+        <!-- ALOCACAO -->
+        <lightning-tab label="Alocação">
+            Three Content !
+        </lightning-tab>
+    </lightning-tabset>
+</template>

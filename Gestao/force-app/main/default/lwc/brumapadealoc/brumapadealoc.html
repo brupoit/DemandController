@@ -1,0 +1,106 @@
+<template>
+  <lightning-tabset>
+    <lightning-tab label="Capacity por Demanda">
+      <div class="slds-grid slds-grid_align-spread">
+        <div class="slds-col slds-size_7-of-12">
+          <lightning-card title="Horas por Demanda" icon-name="utility:chart">
+            <c-module-chart-js-helper data-id="task" class="taskChart" lwc-class="taskChart" chart-config={chartTaskConfiguration} chart-class="barChart"  parent-chart-changed={taskChartChanged} onloadchart={loadChart} ></c-module-chart-js-helper>
+          </lightning-card>  
+        </div>
+        <div class="slds-col slds-size_1-of-12" style="border-left: 1px solid rgba(0, 0, 0, 0.226); height: 500px; width: 2px;"></div>
+        <div header="Parametros" class="slds-col slds-size_4-of-12"> 
+          <div style="height:40vh">
+            <div style="float: left; width: 100%"> 
+            <lightning-button variant="neutral" label="Criar Alocação" title="Cadastrar nova alocação de profissional em uma demanda" icon-name="utility:custom_apps" onclick={handleClickAddAlocacao} class="slds-var-m-left_x-small"></lightning-button>
+            <lightning-button variant="neutral" label="Criar Demanda" title="Cadastrar uma nova demanda" onclick={handleClickDemanda} icon-name="utility:desktop" class="slds-m-left_x-small"></lightning-button>
+            </div>
+            <div style="float: left; width: 100%;margin-left: 10px"> 
+            <lightning-input class="startDate" style="width: 150px; float: left" type="date" name="dataInicial" label="Início" value={componentInicialDate} ></lightning-input>
+            <lightning-input class="endDate" style="width: 150px; float: left" type="date" name="dataFinal" label="Fim" value={componentFinalDate} ></lightning-input>
+            <select id="optionsType" class="optionsType">
+              <option value="0">Selecione tipo de visualização</option>
+              <option value="1">Filtro por semana</option>
+              <option value="2">Filtro diário</option>
+            </select>
+          </div>
+          </div>
+          <div slot="footer">
+            <lightning-button variant="neutral" label="Filtrar" title="Ver intervalo selecionado" onclick={handleClickDatePicker} class="slds-var-m-center_small"></lightning-button>
+            <lightning-button variant="neutral" label="Re-render"  onclick={handleRender} class="slds-var-m-center_small"></lightning-button>
+          </div>
+        </div>
+      </div>
+      <div style="width: 100%; overflow-y: scroll">
+        <c-demand-overview variant-start-date={componentInicialDate} variant-end-date={componentFinalDate}></c-demand-overview>
+      </div>
+    </lightning-tab>
+    <lightning-tab label="Capacity por Perfil">
+      <div class="slds-grid slds-grid_align-spread">
+        <div class="slds-col slds-size_7-of-12">
+      <lightning-card title="Horas por Perfil" style="float: left; width: 70%" icon-name="utility:chart">
+        <c-module-chart-js-helper data-id="profile" class="profileChart" lwc-class="profileChart" chart-config={chartProfileConfiguration} chart-class="polarChart" parent-chart-changed={profileChartChanged} onloadchart={loadChart} ></c-module-chart-js-helper>
+      </lightning-card>  
+        </div>
+        <div class="slds-col slds-size_1-of-12" style="border-left: 1px solid rgba(0, 0, 0, 0.226); height: 500px; width: 2px;"></div>
+      <div header="Parametros" class="estiloheader slds-col slds-size_4-of-12" >
+        <div style="height:40vh">
+          <div style="float: left; width: 100%"> 
+          <lightning-button variant="neutral" label="Criar Alocação" title="Cadastrar nova alocação de profissional em uma demanda" icon-name="utility:custom_apps" onclick={handleClickAddAlocacao} class="slds-var-m-left_x-small"></lightning-button>
+          <lightning-button variant="neutral" label="Criar Demanda" title="Cadastrar uma nova demanda" onclick={handleClickDemanda} icon-name="utility:desktop" class="slds-m-left_x-small"></lightning-button>
+          </div>
+          <div style="float: left; width: 100%;margin-left: 10px"> 
+          <lightning-input class="startProfileDate" style="width: 150px; float: left" type="date" name="dataInicial" label="Início" value={componentInicialDate} ></lightning-input>
+          <lightning-input class="endProfileDate" style="width: 150px; float: left" type="date" name="dataFinal" label="Fim" value={componentFinalDate} ></lightning-input>
+        </div>
+        <div slot="footer">
+          <lightning-button variant="neutral" label="Filtrar" title="Ver intervalo selecionado" onclick={handleClickDatePicker} class="slds-var-m-center_small"></lightning-button>
+        </div>
+      </div>
+    </div>
+  </div>
+      <div style="width: 100%; overflow-y: scroll">
+        <c-demand-overview variant-start-date={componentInicialDate} variant-end-date={componentFinalDate}></c-demand-overview>
+      </div>
+    </lightning-tab>
+    <lightning-tab label="Capacity por Tempo">
+      <div class="slds-grid slds-grid_align-spread">
+        <div class="slds-col slds-size_7-of-12">
+      <lightning-card title="Horas por Demanda" style="float: left; width: 70%" icon-name="utility:chart">
+        <c-module-chart-js-helper data-id="profileCapacity" class="profileCapacityChart" lwc-class="profileCapacityChart" chart-config={chartProfileCapacityConfiguration} chart-class="lineChart" parent-chart-changed={profileCapacityChartChanged} onloadchart={loadChart}></c-module-chart-js-helper>
+      </lightning-card>  
+    </div>
+    <div class="slds-col slds-size_1-of-12" style="border-left: 1px solid rgba(0, 0, 0, 0.226); height: 500px; width: 2px;"></div>
+      <div header="Parametros" style="float: left; width: 28%; margin-left: 40px" class=slds-col slds-size_4-of-12>
+        <div style="height:40vh">
+          <div style="float: left; width: 100%"> 
+          <lightning-button variant="neutral" label="Criar Alocação" title="Cadastrar nova alocação de profissional em uma demanda" icon-name="utility:custom_apps" onclick={handleClickAddAlocacao} class="slds-var-m-left_x-small"></lightning-button>
+          <lightning-button variant="neutral" label="Criar Demanda" title="Cadastrar uma nova demanda" onclick={handleClickDemanda} icon-name="utility:desktop" class="slds-m-left_x-small"></lightning-button>
+          </div>
+          <div style="float: left; width: 100%;margin-left: 10px"> 
+          <lightning-input class="startProfileCapacityDate" style="width: 150px; float: left" type="date" name="dataInicial" label="Início" value={componentInicialDate} ></lightning-input>
+          <lightning-input class="endProfileCapacityDate" style="width: 150px; float: left" type="date" name="dataFinal" label="Fim" value={componentFinalDate} ></lightning-input>
+        <div slot="footer">
+          <lightning-button variant="neutral" label="Filtrar" title="Ver intervalo selecionado" onclick={handleClickDatePicker} class="slds-var-m-center_small"></lightning-button>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+      <div style="width: 100%; overflow-y: scroll;" data-id="tableCapacity">
+          <lightning-datatable 
+          class="slds-table slds-table_bordered slds-table_striped"
+          key-field="id"
+          data={data}
+          columns={columns}
+          style="width: max-content; border: 1px solid black !important"
+          min-column-width="200"
+          max-column-width="300"
+        >
+        </lightning-datatable>
+      </div>
+    </lightning-tab>
+  </lightning-tabset>
+<c-modal-cadastro-demanda if:true={cadDemanda} onclose={handleClose}></c-modal-cadastro-demanda>
+<c-modal-cadastro-alocacao if:true={modalAlocacao} onclose={handleClose}></c-modal-cadastro-alocacao>
+<c-modal-cadastro-indisponibilidade if:true={modalIndisponibilidade} onclose={handleClose}></c-modal-cadastro-indisponibilidade>
+</template>

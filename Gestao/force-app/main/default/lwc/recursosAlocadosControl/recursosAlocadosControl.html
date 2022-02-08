@@ -1,0 +1,25 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 02-07-2022
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <div style="float: left; width: 100%;margin-left: 10px"> 
+    <lightning-input class="startDate" style="width: 150px; float: left" type="date" name="dataInicial" label="Início" value={componentInicialDate} ></lightning-input>
+    <lightning-input class="endDate" style="width: 150px; float: left" type="date" name="dataFinal" label="Fim" value={componentFinalDate} ></lightning-input>
+  </div>
+
+  <lightning-button variant="neutral" label="Filtrar" title="Ver intervalo selecionado" onclick={handleClickDatePicker} class="slds-var-m-center_small"></lightning-button>
+
+  <lightning-datatable
+    key-field="id"
+    data={data}
+    columns={columns}
+    onsort={onHandleSort}
+    hide-checkbox-column
+    class="slds-var-m-top_medium slds-var-m-bottom_medium"
+  >
+  </lightning-datatable>
+</template>

@@ -1,0 +1,259 @@
+<apex:page standardController="Visitas__c">
+    <head>
+        <!-- Google Maps API -->
+        <apex:includeScript value="https://maps.google.com/maps/api/js?sensor=false" />
+        <!-- jQuery -->
+        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" />
+        <!-- Salesforce AJAX Toolkit -->
+        <apex:includeScript value="../../soap/ajax/34.0/connection.js" />
+
+        <script type="text/javascript"> 
+            $(document).ready( function() {
+                var map;
+                var circle;
+                var accuracy; 
+                var circleOptions;
+                var accAddress = "{!Visitas__c.Account__r.BillingStreet}, " + 
+                                 "{!Visitas__c.Account__r.BillingCity}, " + 
+                                 "{!Visitas__c.Account__r.BillingPostalCode}, " + 
+                                 "{!Visitas__c.Account__r.BillingCountry}";
+                
+                var geocoder = new google.maps.Geocoder();
+
+                geocoder.geocode( { address: accAddress }, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK && 
+                        results.length &&
+                        status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
+                        
+                        // Opcoes para o mapa.
+                        var myOptions = {
+                            //center: checkinLoc,
+                            zoom: 15,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP,
+                            mapTypeControl: false
+                        }
+
+                        // Criacao do mapa.
+                        map = new google.maps.Map(document.getElementById("map"), myOptions);
+
+                        // Criacao do marcador da conta.
+                        var accMarker = new google.maps.Marker({
+                            position: results[0].geometry.location,
+                            map: map,
+                            title: "Endereço da Conta",
+                            zIndex: 1
+                        });
+
+                        var pinIcon = new google.maps.MarkerImage(                            
+                            "https://maps.google.com/mapfiles/arrow.png",
+                            null,
+                            null,
+                            new google.maps.Point(11,34)
+                        );
+                        accMarker.setIcon(pinIcon);
+                        
+                        // Cria perimetro que contem o marcador e redimensiona o mapa.
+                        var bounds = new google.maps.LatLngBounds();
+                            bounds.extend(accMarker.getPosition());
+                        map.fitBounds(bounds);
+
+                        // Mostra as informacoes da conta ao passar o mouse.
+                        var accInfowindow = new google.maps.InfoWindow({
+                            content: "<div onclick=\"redirectToId('{!Visitas__c.Account__r.Id}')\";><h3>{!Visitas__c.Account__r.Name}</h3><br><p>{!Visitas__c.Account__r.BillingStreet}<br/>{!Visitas__c.Account__r.BillingCity}<br/>{!Visitas__c.Account__r.BillingCountry}</p></div>"
+                        });
+
+                        google.maps.event.addListener(accMarker, 'click', function() {
+                            accInfowindow.open(map,accMarker);
+                        });
+
+                        // Coordenadas de latitude e longitude (check-in).
+                        var checkinLat = "{!Visitas__c.Local_do_Check_In__Latitude__s}";
+                        var checkinLng = "{!Visitas__c.Local_do_Check_In__Longitude__s}";
+                        
+                        if (checkinLat.length > 0 && checkinLng.length > 0) {
+                            var checkinLoc = new google.maps.LatLng(checkinLat, checkinLng);
+                        
+                            // Cria o marcador.
+                            var checkinMarker = new google.maps.Marker({
+                                position: checkinLoc,
+                                map: map,
+                                title: "Check-In",
+                                zIndex: 2
+                            });
+                            iconFile = 'https://maps.google.com/mapfiles/dd-start.png'; 
+                            checkinMarker.setIcon(iconFile);
+
+                            // Calcula e mostra a distancia entre o check-in e a conta.
+                            var distance = calculateDistance(
+                                checkinLat, checkinLng, 
+                                results[0].geometry.location.lat(), results[0].geometry.location.lng()
+                            );
+                            document.getElementById("checkinDist").innerHTML = 
+                                "{!$Label.Distancia_do_Check_In}: " +
+                                distance.toFixed(1) + " {!$Label.Metros}.";
+
+                            // Redimensiona o mapa para conter o novo marcador.
+                            bounds.extend(checkinMarker.getPosition());
+                            map.fitBounds(bounds);
+
+                            // Cria circulo ao redor do marcador, de acordo com a precisao.
+                            accuracy = "{!Visitas__c.Precisao_do_Check_In__c}";
+                            if (accuracy != null && accuracy != "") {
+                                circleOptions = {
+                                    strokeColor: '#00FF00',
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 2,
+                                    fillColor: '#00FF00',
+                                    fillOpacity: 0.35,
+                                    map: map,
+                                    center: checkinLoc,
+                                    radius: parseInt(accuracy)
+                                };
+
+                                circle = new google.maps.Circle(circleOptions);
+
+                                // Redimensiona o mapa para conter o circulo.
+                                bounds.union(circle.getBounds());
+                                map.fitBounds(bounds);
+                            }
+
+                            // Mostra as informacoes do Check-In ao passar o mouse.
+                            var checkinInfowindow = new google.maps.InfoWindow({
+                                content: "<h3>Check-In</h3><br><p>{!Visitas__c.Data_e_Horario_de_Check_In__c}</p>"
+                            });
+
+                            google.maps.event.addListener(checkinMarker, 'click', function() {
+                                checkinInfowindow.open(map,checkinMarker);
+                            });
+                            
+                            // Coordenadas de latitude e longitude (check-out).
+                            var checkoutLat = "{!Visitas__c.Local_do_Check_Out__Latitude__s}";
+                            var checkoutLng = "{!Visitas__c.Local_do_Check_Out__Longitude__s}";
+                            
+                            if (checkoutLat.length > 0 && checkoutLng.length > 0) {
+                                var checkoutLoc = new google.maps.LatLng(checkoutLat, checkoutLng);
+                            
+                                // Cria o marcador.
+                                var checkoutMarker = new google.maps.Marker({
+                                    position: checkoutLoc,
+                                    map: map,
+                                    title: "Check-Out",
+                                    zIndex: 3
+                                });
+
+                                var pinIcon = new google.maps.MarkerImage(
+                                    "https://maps.google.com/mapfiles/dd-end.png",
+                                    null,
+                                    null,
+                                    null,
+                                    new google.maps.Size(17,27)
+                                );
+                                checkoutMarker.setIcon(pinIcon);
+
+                                // Calcula e mostra a distancia entre o check-out e a conta.
+                                distance = calculateDistance(
+                                    checkoutLat, checkoutLng, 
+                                    results[0].geometry.location.lat(), results[0].geometry.location.lng()
+                                );
+                                document.getElementById("checkoutDist").innerHTML = 
+                                    "{!$Label.Distancia_do_Check_Out}: " +
+                                    distance.toFixed(1) + " {!$Label.Metros}.";
+
+                                // Redimensiona o mapa para conter o novo marcador.
+                                bounds.extend(checkoutMarker.getPosition());
+                                map.fitBounds(bounds);
+
+                                // Cria circulo ao redor do marcador, de acordo com a precisao.
+                                accuracy = "{!Visitas__c.Precisao_do_Check_Out__c}";
+                                if (accuracy != null && accuracy != "") {
+                                    circleOptions = {
+                                        strokeColor: '#FF0000',
+                                        strokeOpacity: 0.8,
+                                        strokeWeight: 2,
+                                        fillColor: '#FF0000',
+                                        fillOpacity: 0.35,
+                                        map: map,
+                                        center: checkoutLoc,
+                                        radius: parseInt(accuracy)
+                                    };
+
+                                    circle = new google.maps.Circle(circleOptions);
+
+                                    // Redimensiona o mapa para conter o circulo.
+                                    bounds.union(circle.getBounds());
+                                    map.fitBounds(bounds);
+                                }
+
+                                // Mostra as informacoes do Check-Out ao passar o mouse.
+                                var checkoutInfowindow = new google.maps.InfoWindow({
+                                    content: "<h3>Check-Out</h3><br><p>{!Visitas__c.Data_e_Horario_de_Check_Out__c}</p>"
+                                });
+
+                                google.maps.event.addListener(checkoutMarker, 'click', function() {
+                                    checkoutInfowindow.open(map, checkoutMarker);
+                                });
+                            }
+                        }
+                    } 
+                    else {
+                        $('#map').css({'height' : '15px'});
+                        $('#map').html("Account address could not be found, please check it.");
+                        resizeIframe();
+                    }
+                });                
+            });
+
+            function redirectToId(id) {
+                var url = "/" + id;
+
+                if ( (typeof sforce.one) !== "undefined" && sforce.one !== null ) {
+                    sforce.one.navigateToSObject(id);
+                }
+                else {
+                    parent.frames.location.href = url; 
+                }
+            }
+            
+            function resizeIframe() {
+                var me = window.name;
+                if (me) {
+                    var iframes = parent.document.getElementsByName(me);
+                    if (iframes && iframes.length == 1) {
+                        height = document.body.offsetHeight;
+                        iframes[0].style.height = height + "px";
+                    }
+                }
+            }
+
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                var R = 6371000; // Razao de conversao para metros.
+                var dLat = toRad((lat2 - lat1));
+                var dLon = toRad((lon2 - lon1)); 
+                var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                        Math.sin(dLon/2) * Math.sin(dLon/2); 
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            }
+
+            function toRad(angle) {
+                return angle * Math.PI / 180;
+            }
+        </script>
+        
+        <style>
+            #map {
+                font-family: Arial;
+                font-size: 12px;
+                line-height: normal !important;
+                height: 300px;
+                background: transparent;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h3 id="checkinDist"></h3><br/>
+        <h3 id="checkoutDist"></h3>
+        <div id="map"></div>
+    </body> 
+</apex:page>

@@ -1,0 +1,189 @@
+<apex:page docType="html-5.0" action="{!init}" standardController="Registro_de_horas__c" extensions="EcrmHarpiaController" showHeader="true" lightningStyleSheets="true" standardStylesheets="true" title="Registro de Horas">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js" />
+        <apex:stylesheet value="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/ui-smoothness/jquery-ui.css"/>
+            <style>
+            input:-webkit-outer-spin-button,
+                input:-webkit-inner-spin-button {
+                    display: none; 
+                }
+    </style>
+    <apex:includeScript value="/support/console/35.0/integration.js"/>
+        <script type="text/javascript">
+            var callback = function () {
+                if (result.error) {
+                    alert("Error message is " + result.error);
+                }
+            };
+    
+    
+    function sucesso(IdPagina, msg){
+        alert(msg);
+        var win = window.open('/'+IdPagina,'_self');
+        //win.close();
+    }
+    
+    
+    
+    /*
+    //BETA PARA FECHAR SUB TAB DE EDIÇÃO/INSERÇÃO/CANCELAR E DAR REFRESH DA SUB TAB DE DETALHES
+    function testCloseTab() {
+        //First find the ID of the current tab to close it
+        alert('classic');
+        alert(sforce.console.isInConsole());
+        sforce.console.getFocusedPrimaryTabId(showPrimaryTabId);
+    }
+    
+    var showPrimaryTabId = function showPrimaryTabId(result) {
+        // Display the object ID
+        alert('result.id: '+result.id);
+        sforce.console.getSubtabIds(result.id,showTabId);
+    };    
+    
+    //BUSCA A SUBTAB
+    var showTabId = function showTabId(result) {
+        var subTabId = "";
+        subTabId += result.ids;
+        var tabSplit = subTabId.split(",");
+        alert('tabSplit: '+tabSplit);
+        sforce.console.refreshSubtabById(tabSplit[0], true, null);
+        sforce.console.getEnclosingTabId(closeSubtab);
+    };
+    
+    var closeSubtab = function closeSubtab(result) {
+        //Now that we have the tab ID, we can close it
+        var tabId = result.id;
+        alert('tabId: '+tabId);
+        sforce.console.closeTab(tabId, callback);       
+    };
+    */
+    
+    
+    
+    
+    $( document ).ready(function testIsInConsole() {
+        console.log('ENTROOOOU');
+        //if (sforce.console.isInConsole()) {      
+        verificaConsole();
+        console.log('MEU DEBUG');
+        console.log('{!isConsole}');
+        //}
+    });
+    
+    </script>
+    
+    <apex:form >
+        <apex:outputText value="{!callfunc}" escape="false"></apex:outputText>
+        <apex:actionFunction action="{!verificaConsole}" name="verificaConsole" rerender="merenderiza"/>
+        <!-- <apex:input id="merenderiza" value="{!isConsole}" onchange="verificaConsole();"/> -->
+        <input type="hidden" onload="verificaConsole();" value="{!isConsole}" id="merenderiza"/>
+    </apex:form>   
+    
+    <apex:sectionHeader title="Edição de Registro de Horas" subtitle="Novo Registro de Horas"/>    
+    <apex:outputPanel id="registroDeHoras">
+        <apex:pageMessages />
+        <apex:form style="width:100%">           
+            
+            <apex:pageBlock mode="edit" id="pageBlock3" rendered="{!AND(!logado, naoExiste)}">
+                <script>
+                var msg = '{!urlRedirectDeletado}';
+                alert('{!$Label.Registro_de_horas_deletado_ecrm}')
+                window.location.replace(msg);
+                testCloseTab();
+                </script>      
+            </apex:pageBlock>
+            
+            <apex:pageBlock mode="edit" id="pageBlock2" rendered="{!AND(!logado, !naoExiste)}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Logar"  id="logar" action="{!logar}"/>
+                    <apex:commandButton value="Cancelar"  id="cancel" immediate="true" onClick="testCloseTab();return false" html-formnovalidate="formnovalidate"/>
+                </apex:pageBlockButtons> 
+                
+                <apex:pageBlockSection id="login" title="Login" collapsible="false" columns="1">                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Usuário" for="usuario"/>
+                        <apex:input required="false" value="{!usuario}" id="usuario"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Senha" for="senha"/>
+                        <apex:inputSecret required="false" value="{!senha}" id="senha"/>
+                    </apex:pageBlockSectionItem>                    
+                    <apex:inputHidden value="{!parametroGet}" id="parametroGet"/>
+                </apex:pageBlockSection>                
+            </apex:pageBlock>
+            <apex:pageBlock mode="edit" id="pageBlock" rendered="{!logado}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Salvar"  id="new" action="{!save}"/>
+                    <apex:commandButton value="Cancelar"  id="cancel" immediate="true" onClick="testCloseTab();return false" html-formnovalidate="formnovalidate"/>
+                </apex:pageBlockButtons> 
+                <apex:pageBlockSection id="infos" title="Informações" collapsible="false" columns="2">      
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Centro de custo:" for="centroDeCusto" />
+                        <apex:selectList value="{!registro.Cost_Center_Id__c}" size="1" id="centroDeCusto" label="Organization">
+                            <apex:selectOptions value="{!centroDeCustoLista}"/>                             
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Período:" for="periodo" />
+                        <apex:selectList value="{!registro.Period_Id__c}" size="1">
+                            <apex:selectOptions value="{!periodoLista}"/>
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>   
+                    <apex:inputHidden id="rowId" value="{!registro.RowId__c}"/>
+                    <apex:inputHidden id="rowVersion" value="{!registro.Row_Version__c}"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Data" for="data"/>
+                        <apex:inputField value="{!registro.Data__c}" id="data"/>
+                    </apex:pageBlockSectionItem>  
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Caso" for="caso"/>
+                        <apex:outputField value="{!RegistroDeHorasLista.CaseNumber}" id="caso"/>
+                    </apex:pageBlockSectionItem>       
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Hora" for="hora"/>
+                        <apex:inputField value="{!registro.Hora__c}" id="hora" style="width:35px;"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Hora extra" for="horaExtra"/>
+                        <apex:inputField value="{!registro.Hora_extra__c}" id="horaExtra" style="width:35px;"/>
+                    </apex:pageBlockSectionItem>      
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Sobreaviso" for="sobreaviso"/>
+                        <apex:inputField value="{!registro.Sobreaviso__c}" id="sobreaviso" style="width:35px;"/>
+                    </apex:pageBlockSectionItem>            
+                    
+                    <apex:pageBlockSectionItem HelpText="22h às 5h">
+                        <apex:outputLabel value="Hora Noturna" for="horaNoturna"/>
+                        <apex:inputField value="{!registro.Hora_noturna__c}" id="horaNoturna" style="width:35px;"/>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="infosAdicionais" title="Informações adicionais" collapsible="false" columns="1">                              
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Comentários" for="comentarios"/>
+                        <apex:inputField style="width:473px; height:48px;" value="{!registro.Comentarios__c}" id="comentarios"/>
+                    </apex:pageBlockSectionItem> 
+                </apex:pageBlockSection>
+                
+            </apex:pageBlock>         
+        </apex:form>
+    </apex:outputPanel>
+    
+    <apex:form > 
+        <apex:outputPanel id="newInvoice"> 
+            <apex:pageBlock title="New Invoice" rendered="">
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+    
+    
+</apex:page>

@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+<ltng:require scripts="{!$Resource.ChartJs}" afterScriptsLoaded="{!c.init}"/>
+<aura:attribute name="dataset" type="String" default="1"  description="Which set of data to display in the chart.  Will be either 1 or 2"/>
+<aura:attribute name="config" type="String" />
+    <div  style="position: relative; height:40vh; width:80vw" class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--3-of-4">
+        Chart1<br></br>
+        <canvas aura:id="andeeChart" id="andeeChart123"/>
+    </div>
+</aura:component>

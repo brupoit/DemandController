@@ -1,0 +1,96 @@
+<apex:page docType="html-5.0" standardController="Invoice__c" extensions="InvoicesController" tabStyle="Opportunity" recordSetVar="invoices" lightningStylesheets="true">
+    <apex:pageMessages />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" />
+    <style type="text/css">
+    .empty-column-content {
+        display: none;
+    }
+    
+    .custPopup{
+            /*background-color: white;
+            border-width: 2px;
+            border-style: solid;*/
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            /* These are the 3 css properties you will need to change so the popup 
+            displays in the center of the screen. First set the width. Then set 
+            margin-left to negative half of what the width is. You can add 
+            the height property for a fixed size pop up if you want.*/
+            width: 500px;
+            margin-left: -250px;
+            top:100px;
+        }
+        .popupBackground{
+            /*background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20)!important;*/
+            background-color: rgba(0,0,0,0.5);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        
+    </style>
+    
+    <apex:sectionHeader title="Oportunidade: {!opp.Name}"/>
+    <apex:outputPanel id="invoiceLines">
+        <apex:form style="width:100%">
+            <apex:pageBlock >
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Save" action="{!doSave}"  />
+                    <apex:commandButton value="Nova Fatura" action="{!newInvoice}" id="new"/>
+                    <apex:commandButton value="Cancel" action="{!cancel}" id="voltar"/>
+                </apex:pageBlockButtons>    
+                    <apex:pageBlockTable value="{!invoices}" style="width:100%" var="inv" id="table" >
+                        <apex:column value="{!inv.Name}" />           
+                        <apex:column headerValue="Date" >
+                            <apex:inputField value="{!inv.Date__c}"/>                     
+                        </apex:column>
+                        <apex:column headerValue="Value" >
+                            <apex:inputField value="{!inv.Value__c}"/>                     
+                        </apex:column>
+                        <apex:column headerValue="Status" >
+                            <apex:inputField value="{!inv.Status__c}" required="true" />                     
+                        </apex:column>
+                        <apex:column headerValue="Número da NF" >
+                            <apex:inputField value="{!inv.Numero_da_NF__c}" required="false" />                     
+                        </apex:column>
+                        <apex:column headerValue="Data de emissão" >
+                            <apex:inputField value="{!inv.Data_de_emissao__c}" required="false" />                     
+                        </apex:column>
+                        <apex:column headerValue="Data de depósito" >
+                            <apex:inputField value="{!inv.Data_de_deposito__c}" required="false" />                     
+                        </apex:column>
+                        <apex:column >
+                            <center>
+                                <div class="bs">
+                                    <span class="btnremove glyphicon glyphicon-trash btn pull-left"></span>
+                                </div>
+                            </center>
+                            <apex:inputField style="display:none" value="{!inv.Id}"/>  
+                        </apex:column>
+                    </apex:pageBlockTable>
+            </apex:pageBlock>
+            
+            <apex:input style="display:none" value="{!deleteInvoice}" id="IdInvoiceDelete"/> 
+            <apex:actionFunction action="{!doRemoveInvoice}" name="doRemoveInvoice" reRender="invoiceLines,javascriptPanel"/>
+        </apex:form>
+    </apex:outputPanel>
+    <apex:outputPanel id="javascriptPanel">
+        <script type="text/javascript">
+            j$ = jQuery.noConflict();
+            j$(".btnremove").on("click",function (){
+                if (confirm('Você deseja deletar esta fatura?')) { 
+                    j$('[id$=IdInvoiceDelete]').val(j$(this).parent().parent().parent().parent().index());
+                    doRemoveInvoice();
+                }
+            });
+        </script>
+    </apex:outputPanel>
+    
+</apex:page>

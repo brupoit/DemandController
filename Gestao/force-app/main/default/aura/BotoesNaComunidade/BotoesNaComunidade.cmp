@@ -1,0 +1,27 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens" access="global">
+	
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="BotoesUpdate" type="String" default = "Update Do Salesforce"/>
+    
+    <force:recordData aura:id="recordLoader"
+                      mode="EDIT"
+                      recordId="{!v.recordId}"
+                      layoutType="FULL"
+                      targetFields="{!v.simpleRecord}"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.handleRecordUpdated}"
+                      />
+    
+    <div class="c-container" align="center">
+        <!-- <lightning:button variant="brand" label = "Validar Melhoria" onclick="{!c.ValidarMelhoriaJS}"/> -->
+        <lightning:button variant="brand" label = "Reabrir" onclick="{!c.ReabrirCasoJS}"/>
+        <lightning:button variant="brand" label = "Aprovar Homologação" onclick="{!c.AprovarHomologacaoJS}"/>
+        <lightning:button variant="brand" label = "Reprovar Homologação" onclick="{!c.ReprovarHomologacaoJS}"/>        
+        <!-- <lightning:button variant="brand" label = "Validar Caso" onclick="{!c.validarCaso}"/> -->
+        <!-- <lightning:button variant="brand" label = "Aprovar Caso" onclick="{!c.aprovarCaso}"/> -->
+        <!-- <lightning:button variant="brand" label = "Reprovar Caso" onclick="{!c.reprovarCaso}"/>         -->
+    </div>
+    
+</aura:component>

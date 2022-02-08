@@ -1,0 +1,63 @@
+{
+  "description": "Encapsulates Google Charts into a web component",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "lit-element",
+    "chart",
+    "charts",
+    "google-visualization",
+    "google"
+  ],
+  "homepage": "https://googlewebcomponents.github.io/google-chart",
+  "repository": "GoogleWebComponents/google-chart",
+  "name": "@google-web-components/google-chart",
+  "version": "5.0.1",
+  "resolutions": {
+    "inherits": "2.0.3",
+    "samsam": "1.1.3",
+    "supports-color": "3.1.2",
+    "type-detect": "1.0.0"
+  },
+  "type": "module",
+  "main": "google-chart.js",
+  "module": "google-chart.js",
+  "files": [
+    "google-chart.d.ts*",
+    "google-chart.js*",
+    "loader.d.ts*",
+    "loader.js*"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "start": "web-dev-server --app-index demo/index.html --node-resolve --open --watch",
+    "pretest": "npm run build",
+    "test": "web-test-runner",
+    "test:watch": "web-test-runner --watch"
+  },
+  "contributors": [
+    "Wes Alvaro",
+    "Sérgio Gomes",
+    "Rafal Slawik"
+  ],
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@open-wc/testing": "^2.5.33",
+    "@polymer/decorators": "^3.0.0",
+    "@polymer/polymer": "^3.4.1",
+    "@types/google.visualization": "0.0.68",
+    "@types/mocha": "^9.0.0",
+    "@web/dev-server": "^0.1.25",
+    "@web/test-runner": "^0.13.20",
+    "sinon": "^11.1.2",
+    "typescript": "^4.5.4"
+  },
+  "typings": "google-chart.d.ts",
+  "dependencies": {
+    "lit": "^2.0.2"
+  }
+}

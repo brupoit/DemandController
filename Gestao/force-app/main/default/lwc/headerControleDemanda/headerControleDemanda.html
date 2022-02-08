@@ -1,0 +1,62 @@
+<template>
+  <c-modal-cadastro-profissional
+    if:true={cadProfissional}
+    onclose={handleClose}
+  >
+  </c-modal-cadastro-profissional>
+  <c-modal-cadastro-demanda if:true={cadDemanda} onclose={handleClose}>
+  </c-modal-cadastro-demanda>
+  <c-modal-cadastro-perfil if:true={cadPerfil} onclose={handleClose}>
+  </c-modal-cadastro-perfil>
+
+  <div class="slds-m-bottom_medium">
+    <lightning-card title="Cadastros">
+      <div class="slds-m-top_medium slds-m-bottom_medium">
+        <lightning-button
+          variant="brand"
+          label="Criar Profissional/Funcionário"
+          title="Cadastrar um novo profissional/funcionário"
+          icon-name="utility:adduser"
+          onclick={handleClickProfissional}
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="brand"
+          label="Criar Perfil Profissional"
+          title="Cadastrar um novo perfil profissional."
+          icon-name="utility:profile"
+          onclick={handleClickPerfil}
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="brand"
+          label="Criar Demanda"
+          title="Cadastrar uma nova demanda"
+          onclick={handleClickDemanda}
+          icon-name="utility:desktop"
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="brand"
+          label="Criar Período de Indisponibilidade"
+          title="Cadastrar um novo período de indisponibilidade do funcionário"
+          icon-name="utility:block_visitor"
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+        <lightning-button
+          variant="brand"
+          label="Criar Alocação"
+          title="Cadastrar nova alocação de profissional em uma demanda"
+          icon-name="utility:custom_apps"
+          class="slds-m-left_x-small"
+        >
+        </lightning-button>
+      </div>
+    </lightning-card>
+    
+  </div>
+</template>

@@ -1,0 +1,47 @@
+<aura:component implements="flexipage:availableForAllPageTypes"  controller="AlocacaoProfissionalController"  access="global">
+<ltng:require scripts="{!join(',', $Resource.ChartJs, $Resource.Underscore+ '/underscore-min.js')}" afterScriptsLoaded="{!c.init}"/>
+
+<aura:attribute name="initialDate" type="Date" />
+<aura:attribute name="endDate" type="Date" />
+<aura:attribute name="hasRendered" type="Boolean" default="false" />
+<aura:attribute name="columns" type="Object[]" default="false" />
+
+<aura:attribute name="configChart1" type="Object[]" />
+
+<aura:attribute name="var1" type="Aura.Component[]" />
+<aura:attribute name="var2" type="Aura.Component[]" />
+<aura:attribute name="var3" type="Aura.Component[]" />
+<c:moduleHelpers aura:id="moduleHelpers"/>
+
+<aura:attribute name="dataset" type="String" default="1"  description="Which set of data to display in the chart.  Will be either 1 or 2"/>
+
+<div class="slds-grid slds-wrap">
+    <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+        <ui:inputCheckbox label="Toggle Data?" click="{!c.updateDatasetDel}"/>
+    </div>
+    <lightning:tabset>
+        <lightning:tab onactive="{! c.handleActive }" label="Item One">
+        <div class="slds-grid slds-gutters"> 
+            <div class="slds-col">
+                {!v.var1}
+            </div>
+            <div class="slds-col">
+                <lightning:input type="date" name="dateInput1"  label="Data Inicial" value="{!v.initialDate}" />
+                <lightning:input type="date" name="dateInput2" label="Data Final" value="{!v.endDate}"/>
+                <lightning:button variant="base" label="Filtrar" title="Filtrar" onclick="{! c.onFilter }"/>
+            </div>
+        </div>   
+        </lightning:tab>
+        <lightning:tab onactive="{! c.handleActive }" label="Item Two">
+            Two Content !
+           {!v.var2} 
+        </lightning:tab>
+        <lightning:tab onactive="{! c.handleActive }" label="Item Three">
+            Three Content !
+           {!v.var3} 
+        </lightning:tab>
+    </lightning:tabset>
+  
+
+</div>
+</aura:component>

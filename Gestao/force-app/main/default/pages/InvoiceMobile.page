@@ -1,0 +1,262 @@
+<apex:page docType="html-5.0" standardController="Opportunity" extensions="InvoicesController" showHeader="false" sidebar="false" applyBodyTag="false" applyHtmlTag="false" standardStylesheets="false" showQuickActionVfHeader="false">
+    <apex:pageMessages />
+    <apex:stylesheet value="{!URLFOR($Resource.Bootstrap, '/bootstrap-3.3.6-dist/css/bootstrap.min.css')}"></apex:stylesheet>
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" />
+    <apex:includeScript value="{!URLFOR($Resource.Bootstrap, '/bootstrap-3.3.6-dist/js/bootstrap.min.js')}"></apex:includeScript>
+    <apex:includeScript value="/canvas/sdk/js/publisher.js"></apex:includeScript>
+    <style type="text/css">
+    .empty-column-content {
+        display: none;
+    }
+    .smartCard{
+       font-size: 10px;
+    }
+    .validationError {
+        border-color: red !important;
+        border-width: 1px !important;
+    }
+    .custPopup{
+        /*background-color: white;
+        border-width: 2px;
+        border-style: solid;*/
+        z-index: 9999;
+        left: 50%;
+        padding:10px;
+        position: absolute;
+        /* These are the 3 css properties you will need to change so the popup 
+        displays in the center of the screen. First set the width. Then set 
+        margin-left to negative half of what the width is. You can add 
+        the height property for a fixed size pop up if you want.*/
+        width: 500px;
+        margin-left: -250px;
+        top:100px;
+    }
+    .popupBackground{
+        /*background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20)!important;*/
+        background-color: rgba(0,0,0,0.5);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 9998;
+    }
+    .bs * {
+        font-family:Arial,Helvetica,sans-serif;
+    }
+        
+    </style>
+    
+    <div class="bs">
+    <apex:sectionHeader title="{!opp.Name}"/>
+    	<apex:actionstatus id="statusPopup">
+            <apex:facet name="start">
+                <div class="waitingSearchDiv" id="el_loading" style="display:block; background-color: #fbfbfb;height: 100%;opacity:0.65;width:100%; position: fixed;top:0px; z-index:46545343456;"> 
+                    <div class="waitingHolder" style="position: fixed; top: 50%; left:40%; width: 91px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Aguarde um momento" />
+                        <span class="waitingDescription">Aguarde um momento</span>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionstatus>
+	    <apex:outputPanel id="invoiceLines">
+	        <apex:form style="width:100%">
+	            <apex:pageBlock >
+	                <table class="table table-striped">
+	                	<thead>
+	                		<tr>
+	                			<th># Fatura</th>
+	                			<th></th>
+	                		</tr>
+	                	</thead>
+                    	<tbody>
+                    		<apex:repeat value="{!invoices}" var="inv" id="table">
+                    			<tr>
+                    				<td class="openModal" name="{!inv.Name}">
+                    					<apex:outputField value="{!inv.Name}"/>
+                    				</td>
+                    				<td class="openModal">
+                    					<apex:outputPanel id="data_lbl">
+											<span>Data:&nbsp;</span>
+											<apex:outputField id="data_sc" value="{!inv.Date__c}"/>
+											<br/>
+										</apex:outputPanel>
+										<apex:outputPanel id="valor_lbl">
+											<span>Valor:&nbsp;</span>
+											<apex:outputField id="valor_sc" value="{!inv.Value__c}"/>
+											<br/>
+										</apex:outputPanel>
+										<apex:outputPanel id="status_lbl">
+											<span>Status:&nbsp;</span>
+											<apex:outputField id="status_sc" value="{!inv.Status__c}"/>
+											<br/>
+										</apex:outputPanel>
+                    				</td>
+                    				<td class="fields" style="padding-left:0px; padding-right:0px">
+                    				<!-- Campos -->
+                                        <apex:inputField id="identifier" style="display:none;" value="{!inv.Id}"/> 
+                    					<apex:inputField id="name" html-data-role="none" style="display:none;" value="{!inv.Name}" showDatePicker="false"/>
+                    					<apex:inputField id="date" html-data-role="none"  style="display:none;" value="{!inv.Date__c}" showDatePicker="false"/>
+				                        <apex:inputField id="value" html-data-role="none" style="display:none;" value="{!inv.Value__c}" />
+				                        <apex:inputField id="status" html-data-role="none" style="display:none;" value="{!inv.Status__c}"/>  
+                    				</td>
+                    			</tr>
+                    		</apex:repeat>
+                    	</tbody>
+                    </table>
+	            </apex:pageBlock>
+	            <apex:commandButton styleClass="btn btn-default btn-lg btn-block" value="Nova Fatura" onclick="newInvoice(); return false;" id="new"/>
+	            <br/>
+	            <apex:commandButton styleClass="btn btn-default btn-lg btn-block" value="Salvar" onclick="doSave(); return false;"  />
+	            <apex:commandButton styleClass="btn btn-default btn-lg btn-block" value="Cancelar" id="voltar" onclick="redirect()"/>
+	            <apex:actionFunction status="statusPopup" action="{!doSaveMobile}" name="doSave" oncomplete="redirect()" reRender="invoiceLines,javascriptPanel"/>
+                <apex:actionFunction status="statusPopup" action="{!newInvoice}" name="newInvoice" reRender="invoiceLines,javascriptPanel"/>
+	        </apex:form>
+	    </apex:outputPanel>
+	    <!-- Modal -->
+	    <apex:form id="modal_form">
+		    <div class="modal fade" id="modal" tabindex="-1" role="dialog">
+	            <input data-role="none" style="display:none;" id="line" type="text" autocomplete="off"/>
+	            <div class="modal-dialog" role="document">
+	                <div class="modal-content">
+	                    <div class="modal-header">
+	                        <center><h4 class="modal-title" id="modalname"></h4> </center>
+	                    </div>
+	                    <div class="modal-body form">
+	                        <apex:pageBlock mode="detail">
+	                        	<div class="form-group">
+		                            <label >Data</label>
+		                            <input id="modal_data" type="date" class="OutputTextClass form-control"/>
+		                        </div>
+		                        <div class="form-group">
+		                            <label >Valor</label>
+		                            <input type="number" id="modal_valor" label="Valor" class="OutputTextClass form-control"/>
+	                            </div>
+	                            <div class="form-group">
+		                            <label >Status</label>
+		                            <apex:inputField styleClass="form-control" id="modal_status" label="Status" value="{!newInvoice.Status__c}"/>
+	                            </div>
+	                        </apex:pageBlock>
+	                    </div>
+
+	                    <div class="modal-footer">
+                            <span id="btnremove" class="glyphicon glyphicon-trash btn pull-left"></span>
+	                        <span id="btncancel" style="background-color : red"  class="glyphicon glyphicon-remove btn btn-lg"></span>
+	                        <span style="background-color : #39D839" id="btnok" class="glyphicon glyphicon-ok btn btn-lg"></span>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+            <apex:input html-data-role="none" style="display:none;" value="{!deleteInvoice}" id="IdInvoiceDelete"/>
+            <apex:actionFunction status="statusPopup" action="{!doRemoveInvoice}" name="doRemoveInvoice" reRender="invoiceLines,javascriptPanel"/>
+        </apex:form>
+    </div>
+    <script type="text/javascript">
+    	j$ = jQuery.noConflict();
+    	// Function on ok button inside modal
+    	j$('#btnok').on('click',function (event) {
+            var hasError = validate();
+            if (hasError) {
+                j$("#modal").scrollTop(0);
+                return;
+        }
+        
+        var id = document.getElementById("line").value;
+        var data = j$('[id$=modal_data]').val().split('-');
+        document.getElementById(id + "date").value = data[2]+'/'+data[1]+'/'+data[0];
+        document.getElementById(id + "data_sc").innerHTML = data[2]+'/'+data[1]+'/'+data[0];
+        //alert(id+'status');
+        document.getElementById(id + "value").value = j$('[id$=modal_valor]').val().replace(".",",");
+        document.getElementById(id + "valor_sc").innerHTML = j$('[id$=modal_valor]').val().replace(".",",");
+        
+        document.getElementById(id + "status").value = j$('[id$=modal_status]').val();
+        document.getElementById(id + "status_sc").innerHTML = j$('[id$=modal_status]').val();
+        
+        
+        j$('#modal').modal('hide');
+    });
+    // Function on cancel button inside modal
+    j$('#btncancel').on('click',function (event) {
+        j$('#modal').modal('hide');
+    });
+    // Function on trash button inside modal
+    j$('#btnremove').click(function (event) {
+        var id = document.getElementById("line").value;
+        if (confirm('Você deseja deletar esta fatura?')) { 
+            var id = document.getElementById("line").value;
+            j$('[id$=IdInvoiceDelete]').val(
+                j$(document.getElementById(id + "identifier")).parent().parent().index()
+            );
+            doRemoveInvoice();
+            j$('#modal').modal('hide');
+        }
+    });
+    </script>
+    <apex:outputPanel id="javascriptPanel">
+        <script type="text/javascript">
+            
+            function redirect() {
+                if( {!$User.UIThemeDisplayed == 'Theme4t'}) {
+                    if (!{!hasError}) {
+                        
+                        Sfdc.canvas.publisher.publish({name: "publisher.close", 
+                        payload:{ refresh:"true"}});
+                    } else {
+                        j$(document).scrollTop(0);
+                    }
+                } else {
+                    alert('Erro ao redirecionar.');
+                }
+            }
+    
+            j$('.openModal').on('click',function(event) {
+                fillModal(this);
+            });
+        
+        	function fillModal(component) {
+                var fields = j$(component).parent().children('.fields');
+                j$('#line').val(fields.find('[id$=name]').attr('id').replace('name',''));
+                j$('#modalname').text(fields.find('[id$=name]').children().text());
+                
+                var date = fields.find('[id$=date]').val().split('/');
+                j$('#modal_data').val(date[2]+'-'+date[1]+'-'+date[0]);
+    
+                j$('#modal_valor').val(fields.find('[id$=value]').val().replace(',','.'));
+    
+                j$('[id$=modal_status]').val(fields.find('[id$=status]').val());
+                j$('#modal').scrollTop(0);
+                j$('#modal').modal('show');
+            }
+    
+             function validate () {
+                var hasError = false;
+    
+               if (j$('[id$=modal_data]').val() == null || j$('[id$=modal_data]').val() == '') {
+                    hasError = true;
+                    j$('[id$=modal_data]').addClass('validationError');
+                } else {
+                    j$('[id$=modal_data]').removeClass('validationError');
+                }
+                if (j$('[id$=modal_valor]').val() == null || j$('[id$=modal_valor]').val() <= 0) {
+                    hasError = true;
+                    j$('[id$=modal_valor]').addClass('validationError');
+                } else {
+                    j$('[id$=modal_valor]').removeClass('validationError');
+                }
+                if (j$('[id$=modal_status]').val() == null || j$('[id$=modal_status]').val() == '') {
+                    hasError = true;
+                    j$('[id$=modal_status]').addClass('validationError');
+                } else {
+                    j$('[id$=modal_status]').removeClass('validationError');
+                }
+                return hasError;
+            }
+    
+     //------------------------------------------------------------
+
+            
+        </script>
+    </apex:outputPanel>
+</apex:page>

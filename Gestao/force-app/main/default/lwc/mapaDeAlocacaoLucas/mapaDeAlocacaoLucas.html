@@ -1,0 +1,125 @@
+<!-- sldsValidatorIgnore -->
+<template>
+  <lightning-tabset>
+    <lightning-tab label="Por Demanda">
+      <lightning-card
+        title="Horas por Demanda"
+        style="float: left; width: 70%"
+        icon-name="utility:chart"
+      >
+        <c-module-chart-js-helper
+          chart-config={chartTaskConfiguration}
+          chart-class="barChart"
+          id="barChart"
+          parent-chart-changed={taskChartChanged}
+          parent-chart-loaded={parentChartLoaded}
+        ></c-module-chart-js-helper>
+      </lightning-card>
+      <lightning-card
+        title="Configurações"
+        style="float: left; width: 28%; margin-left: 20px"
+        icon-name="utility:table_settings"
+      >
+        <!-- <lightning-quick-action-panel style="width: 100%"> -->
+        <div style="width: 100%">
+          <div style="height: 40vh">
+            <lightning-input
+              class="startDate"
+              style="width: 150px; float: left"
+              type="date"
+              name="dataInicial"
+              label="Início"
+              value={componentInicialDate}
+            ></lightning-input>
+            <lightning-input
+              class="endDate"
+              style="width: 150px; float: left"
+              type="date"
+              name="dataFinal"
+              label="Fim"
+              value={componentFinalDate}
+            ></lightning-input>
+          </div>
+          <div slot="footer">
+            <lightning-button
+              variant="brand"
+              label="Filtrar"
+              title="Ver intervalo selecionado"
+              onclick={handleClickDatePicker}
+              class="slds-var-m-center_small"
+            ></lightning-button>
+          </div>
+        </div>
+        <!--</lightning-quick-action-panel>-->
+      </lightning-card>
+      <div style="width: 100%; overflow-y: scroll">
+        <lightning-datatable
+          key-field="id"
+          data={data}
+          columns={columns}
+          onrowaction={handleRowAction}
+          onrowselection={handleRowSelection}
+          style="width: max-content"
+          min-column-width="200"
+          max-column-width="300"
+        >
+        </lightning-datatable>
+      </div>
+    </lightning-tab>
+    <lightning-tab label="Por Perfil">
+      <lightning-card
+        title="Horas por Perfil Profissional"
+        style="float: left; width: 70%"
+        icon-name="utility:chart"
+      >
+        <c-module-chart-js-helper
+          chart-config={chartProfileConfiguration}
+          chart-class="polarChart"
+          id="polarChart"
+          parent-chart-changed={taskChartChanged}
+          parent-chart-loaded={parentChartLoaded}
+        ></c-module-chart-js-helper>
+      </lightning-card>
+      <lightning-card
+        title="Configurações"
+        style="float: left; width: 28%; margin-left: 20px"
+        icon-name="utility:table_settings"
+      >
+        <!--<lightning-quick-action-panel style="width: 100%">-->
+        <div style="width: 100%">
+          <div style="height: 40vh">
+            <lightning-input
+              class="startDate"
+              style="width: 150px; float: left"
+              type="date"
+              name="dataInicial"
+              label="Início"
+              value={componentInicialDate}
+            ></lightning-input>
+            <lightning-input
+              class="endDate"
+              style="width: 150px; float: left"
+              type="date"
+              name="dataFinal"
+              label="Fim"
+              value={componentFinalDate}
+            ></lightning-input>
+          </div>
+          <div slot="footer">
+            <lightning-button
+              variant="brand"
+              label="Filtrar"
+              title="Ver intervalo selecionado"
+              onclick={handleClickDatePicker}
+              class="slds-var-m-center_small"
+            ></lightning-button>
+          </div>
+        </div>
+        <!--</lightning-quick-action-panel>-->
+      </lightning-card>
+      <div style="width: 100%; overflow-y: scroll">
+        <c-demand-view></c-demand-view>
+      </div>
+    </lightning-tab>
+  </lightning-tabset>
+</template>

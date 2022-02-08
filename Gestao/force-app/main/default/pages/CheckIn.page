@@ -1,0 +1,113 @@
+<apex:page standardController="Visitas__c" showHeader="false" sidebar="false">
+	<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" />
+	<apex:includeScript value="../../soap/ajax/34.0/connection.js" />
+
+	<script type="text/javascript">
+
+		j$ = jQuery.noConflict();
+
+        j$(document).ready(function() {
+
+			if (navigator.geolocation) { // Se o navegador suporta geolocalizacao.
+				// Inicializacao da API do Ajax.
+				sforce.connection.sessionId = "{!$Api.Session_ID}"; 
+
+				// Funcao de callback em caso de sucesso.
+				var setPosition = function(position) {
+					var visitId = "{!Visitas__c.Id}"; 
+					var userId 	= "{!$User.Id}";
+					
+					var visit = new sforce.SObject("Visitas__c");
+
+					// Coloca os valores das coordenadas e horario nas variaveis da visita.
+					visit.set("Id", visitId); 
+					visit.set("Local_do_Check_In__Latitude__s",		position.coords.latitude	); 
+					visit.set("Local_do_Check_In__Longitude__s",	position.coords.longitude	);
+					visit.set("Data_e_Horario_de_Check_In__c",		new Date().toISOString()	);
+					visit.set("Precisao_do_Check_In__c", 			position.coords.accuracy	);
+
+					//alert(position.coords.accuracy);
+					
+					var result = sforce.connection.update([visit]); 
+					
+					if (result[0].getBoolean("success") == false) {
+						alert("{!$Label.Erro_Atualizar_Dados}");
+						redirect();
+					}
+					else {
+						redirect();
+					}
+				};
+
+				// Funcao de callback em caso de falha.
+				var failureMsg = function(positionError) {
+					alert(positionError);
+				}
+
+				// Variaveis do check-in.
+				var checkoutLat	 = "{!Visitas__c.Local_do_Check_Out__Latitude__s}";
+				var checkoutLng	 = "{!Visitas__c.Local_do_Check_Out__Longitude__s}";
+				var checkoutDate = "{!Visitas__c.Data_e_Horario_de_Check_Out__c}";
+
+				// Verificacao do check-in e chamada da funcao de localizacao.
+				if (checkoutLat == "" || checkoutLng == "" || checkoutDate == "") {
+					var options = {enableHighAccuracy: true}; // Ativa a opcao de maior precisao.
+					navigator.geolocation.getCurrentPosition(setPosition, failureMsg, options);
+				}
+				else {
+					alert("{!$Label.Check_Out_Ja_Feito}");
+					redirect();
+				}
+			} else {
+				alert("{!$Label.Nao_Suporta_Geolocalizacao}");
+				redirect();
+			}
+
+		});
+
+		function redirect() {
+			var url = "/{!Visitas__c.Id}";
+
+			if ( (typeof sforce.one) !== "undefined" && sforce.one !== null ) {
+		    	sforce.one.back(true);
+		    }
+		    else {
+		    	parent.frames.location.replace(url); 
+		    }
+		}
+
+	</script>
+
+	<style type="text/css">
+		html, body {
+		    height: 100%;
+		}
+
+		.loading-image {
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.center-container {
+			position: relative;
+		}
+
+		.absolute-center {
+			width: 150;
+			height: 150;
+			overflow: auto;
+			margin: auto;
+			position: absolute;
+			top: 0; left: 0; bottom: 0; right: 0;
+		}
+	</style>
+
+	<body class="center-container">
+		<div class="absolute-center">
+			<img src="{!$Resource.loadingIcon}" class="loading-image" />
+			<br/><br/>
+			<p>{!$Label.Processing}</p>
+		</div>
+	</body>
+	
+</apex:page>
